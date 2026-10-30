@@ -9,7 +9,10 @@ class App(tk.Tk):
 		super().__init__()
 
 		self.title(title)
-		self.geometry("300x400"); self.resizable(0,0)
+		self.minsize(300, 400); self.resizable(0,0)
+
+		self.display = Display(self)
+		self.buttons = Buttons(self)
 
 		self.mainloop()
 
