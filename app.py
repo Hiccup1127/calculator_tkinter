@@ -8,7 +8,7 @@ class App(tk.Tk):
 
 		self.title(title)
 		self.geometry("300x400")
-		self.resizable(0,0)
+		# self.resizable(0,0)
 
 		self.top_expression = ""
 		self.expression = ""
@@ -22,43 +22,33 @@ class App(tk.Tk):
 		self.expression += word
 		self.display.display_expr(self.expression, self.top_expression)
 
-
 	def set_operator(self, operator: str) -> None:
-		temp = ""
 		for t in ["+", "-", "*", "/"]:
-			temp = t
 			if t in self.expression[1:]:
-				self.top_expression += self.expression.split(t)[-1]
 				self.calculate(after=operator)
-				self.top_expression += operator
 				return;
-		else:
-			self.expression += operator
-			concat_value = self.expression.split(temp)[-1]
-			if concat_value[0]=="-":
-				self.top_expression += f"({concat_value[:-1]})"
-			else:
-				self.top_expression += concat_value
-			self.display.display_expr(self.expression, self.top_expression)
+		self.expression += operator
+		self.display.display_expr(self.expression, self.top_expression)
 
 
 	def calculate(self, after: str="") -> float:
 		try:
-			if after=="":
-				for t in ["+", "-", "*", "/"]:
-					if t in self.expression[::-1]:
-						self.top_expression += self.expression.split(t)[-1]
-			else:
-				pass
-			
 			res = eval(self.expression)
+
+			if self.top_expression=="" or self.top_expression=="-":
+				self.top_expression += self.expression
+			else:
+				for t in ["+", "-", "*", "/"]: # here must add new operators
+					if t in self.expression[::-1]:
+						self.top_expression += t
+						self.top_expression += self.expression.split(t)[-1]
+
 			if res-int(res)==0:
 				self.expression = str(int(res))
 			else:
 				self.expression = "%.7f"%res
 			
 			self.expression += after
-			# self.top_expression += self.expression
 			self.display.display_expr(self.expression, self.top_expression)
 
 			return res
@@ -66,6 +56,7 @@ class App(tk.Tk):
 			self.display.display_expr("Enter a valid expression!")
 		except ZeroDivisionError:
 			self.display.display_expr("Don't divide by zero!")
+
 
 	def erase(self) -> None:
 		self.expression = ""
@@ -85,11 +76,11 @@ class Display(ttk.Frame):
 	def __init__(self, container):
 		super().__init__(container)
 
-		self.top_string = ttk.Label(self, text="-", font="14")
-		self.main_label = ttk.Label(self, text="---", font="Calibri 20")
+		self.top_string = ttk.Label(self, text="-", font="14", anchor="e")#, justify="right")
+		self.main_label = ttk.Label(self, text="---", font="Calibri 20", anchor="e")
 
-		self.top_string.pack(fill="x")
-		self.main_label.pack(fill="x")
+		self.top_string.pack(expand=True, fill="both")
+		self.main_label.pack(expand=1, fill="both")
 
 		self.pack(fill="both", pady=20)
 	
@@ -181,6 +172,8 @@ class Buttons(ttk.Frame):
 		container.bind("=", lambda e: container.calculate())
 		container.bind("<Return>", lambda e: container.calculate())
 
+		container.bind("q", lambda e: container.destroy())
+		container.bind("<Escape>", lambda e: container.destroy())
 
 		self.pack(expand=True, fill="both")
 
