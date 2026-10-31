@@ -8,7 +8,7 @@ class App(tk.Tk):
 
 		self.title(title)
 		self.geometry("300x400")
-		self.resizable(0,0)
+		# self.resizable(0,0)
 
 		self.top_expression = ""
 		self.expression = ""
@@ -20,25 +20,38 @@ class App(tk.Tk):
 
 	def set_expr(self, word: str) -> None:
 		self.expression += word
-		self.top_expression = self.expression
 		self.display.display_expr(self.expression, self.top_expression)
 
 	def set_operator(self, operator: str) -> None:
+		for t in ["+", "-", "*", "/"]:
+			if t in self.expression[1:]:
+				self.calculate(after=operator)
+				return;
 		self.expression += operator
-		self.top_expression = self.expression
 		self.display.display_expr(self.expression, self.top_expression)
 
 
 	def calculate(self, after: str="") -> float:
 		try:
 			res = eval(self.expression)
+
+			if self.top_expression=="" or self.top_expression=="-":
+				self.top_expression += self.expression
+			else:
+				for t in ["+", "-", "*", "/"]: # here must add new operators
+					if t in self.expression[::-1]:
+						self.top_expression += t
+						self.top_expression += self.expression.split(t)[-1]
+
 			if res-int(res)==0:
 				self.expression = str(int(res))
 			else:
-				self.expression = str(res)
-				self.expression = "%.10f"%float(self.expression)
+				self.expression = "%.7f"%res
+			
 			self.expression += after
-			self.display.display_expr(self.expression)
+			self.display.display_expr(self.expression, self.top_expression)
+
+			return res
 		except SyntaxError:
 			self.display.display_expr("Enter a valid expression!")
 		except ZeroDivisionError:
@@ -51,20 +64,23 @@ class App(tk.Tk):
 		self.display.display_expr("---", "-")
 	
 	def backspace(self) -> None:
-		self.expression = self.expression[:-1]
-		self.top_expression = self.expression
-		self.display.display_expr(self.expression, self.top_expression)
+		if self.expression!="":
+			self.expression = self.expression[:-1]
+			self.display.display_expr(self.expression, self.top_expression)
+		else:
+			self.top_expression = self.top_expression[:-1]
+			self.display.display_expr(self.expression, self.top_expression)
 
 
 class Display(ttk.Frame):
 	def __init__(self, container):
 		super().__init__(container)
 
-		self.top_string = ttk.Label(self, text="-", font="14")
-		self.main_label = ttk.Label(self, text="---", font="Calibri 20")
+		self.top_string = ttk.Label(self, text="-", font="14", anchor="e")#, justify="right")
+		self.main_label = ttk.Label(self, text="---", font="Calibri 20", anchor="e")
 
-		self.top_string.pack(fill="x")
-		self.main_label.pack(fill="x")
+		self.top_string.pack(expand=True, fill="both")
+		self.main_label.pack(expand=1, fill="both")
 
 		self.pack(fill="both", pady=20)
 	
@@ -156,6 +172,8 @@ class Buttons(ttk.Frame):
 		container.bind("=", lambda e: container.calculate())
 		container.bind("<Return>", lambda e: container.calculate())
 
+		container.bind("q", lambda e: container.destroy())
+		container.bind("<Escape>", lambda e: container.destroy())
 
 		self.pack(expand=True, fill="both")
 
