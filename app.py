@@ -20,30 +20,52 @@ class App(tk.Tk):
 
 	def set_expr(self, word: str) -> None:
 		self.expression += word
-		self.top_expression = self.expression
 		self.display.display_expr(self.expression, self.top_expression)
 
+
 	def set_operator(self, operator: str) -> None:
-		self.expression += operator
-		self.top_expression = self.expression
-		self.display.display_expr(self.expression, self.top_expression)
+		temp = ""
+		for t in ["+", "-", "*", "/"]:
+			temp = t
+			if t in self.expression[1:]:
+				self.top_expression += self.expression.split(t)[-1]
+				self.calculate(after=operator)
+				self.top_expression += operator
+				return;
+		else:
+			self.expression += operator
+			concat_value = self.expression.split(temp)[-1]
+			if concat_value[0]=="-":
+				self.top_expression += f"({concat_value[:-1]})"
+			else:
+				self.top_expression += concat_value
+			self.display.display_expr(self.expression, self.top_expression)
 
 
 	def calculate(self, after: str="") -> float:
 		try:
+			if after=="":
+				for t in ["+", "-", "*", "/"]:
+					if t in self.expression[::-1]:
+						self.top_expression += self.expression.split(t)[-1]
+			else:
+				pass
+			
 			res = eval(self.expression)
 			if res-int(res)==0:
 				self.expression = str(int(res))
 			else:
-				self.expression = str(res)
-				self.expression = "%.10f"%float(self.expression)
+				self.expression = "%.7f"%res
+			
 			self.expression += after
-			self.display.display_expr(self.expression)
+			# self.top_expression += self.expression
+			self.display.display_expr(self.expression, self.top_expression)
+
+			return res
 		except SyntaxError:
 			self.display.display_expr("Enter a valid expression!")
 		except ZeroDivisionError:
 			self.display.display_expr("Don't divide by zero!")
-
 
 	def erase(self) -> None:
 		self.expression = ""
@@ -51,9 +73,12 @@ class App(tk.Tk):
 		self.display.display_expr("---", "-")
 	
 	def backspace(self) -> None:
-		self.expression = self.expression[:-1]
-		self.top_expression = self.expression
-		self.display.display_expr(self.expression, self.top_expression)
+		if self.expression!="":
+			self.expression = self.expression[:-1]
+			self.display.display_expr(self.expression, self.top_expression)
+		else:
+			self.top_expression = self.top_expression[:-1]
+			self.display.display_expr(self.expression, self.top_expression)
 
 
 class Display(ttk.Frame):
