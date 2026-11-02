@@ -1,5 +1,6 @@
 import tkinter as tk
 import ttkbootstrap as ttk
+import menu
 
 
 class App(tk.Tk):
@@ -15,6 +16,9 @@ class App(tk.Tk):
 
 		self.display = Display(self)
 		self.buttons = Buttons(self)
+
+		self.top_menu = menu.MainMenu(self)
+		self.config(menu=self.top_menu)
 
 		self.mainloop()
 
