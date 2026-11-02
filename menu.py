@@ -78,7 +78,7 @@ class MainMenu(tk.Menu):
 
         self.row3 = ttk.Frame(self.menu_frame)
         self.row3_key = ttk.Label(self.row3, text="Operations")
-        self.row3_val = ttk.Label(self.row3, text="+, -, *, /, etc")
+        self.row3_val = ttk.Label(self.row3, text="+, -, *, / ; ^ to square the value")
         
         self.row3_val.pack(side="right")
         self.row3_key.pack(expand=True, fill="both", side="right")

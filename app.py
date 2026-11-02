@@ -61,6 +61,17 @@ class App(tk.Tk):
 		except ZeroDivisionError:
 			self.display.display_expr("Don't divide by zero!")
 
+	def square(self) -> float:
+		try:
+			res = pow(float(self.expression), 2)
+
+			self.expression = str(res)
+			self.display.display_expr(self.expression, self.top_expression)
+
+			return res
+		except ValueError:
+			self.display.display_expr("Type correct value!")
+
 
 	def erase(self) -> None:
 		self.expression = ""
@@ -136,7 +147,7 @@ class Buttons(ttk.Frame):
 		ttk.Button(self, text="9", command=lambda: container.set_expr("9"),
 		).grid(column=2, row=3, sticky="nswe", **options)
 
-		ttk.Button(self, text="^2", command=None,
+		ttk.Button(self, text="^2", command=lambda: container.square(),
 		).grid(column=3, row=0, sticky="nswe", **options)
 		ttk.Button(self, text="+", command=lambda: container.set_operator("+"),
 		).grid(column=3, row=1, sticky="nswe", **options)
@@ -168,6 +179,7 @@ class Buttons(ttk.Frame):
 		container.bind("8", lambda e: container.set_expr("8"))
 		container.bind("9", lambda e: container.set_expr("9"))
 
+		container.bind("^", lambda e: container.square())
 		container.bind("+", lambda e: container.set_operator("+"))
 		container.bind("-", lambda e: container.set_operator("-"))
 		container.bind("*", lambda e: container.set_operator("*"))
