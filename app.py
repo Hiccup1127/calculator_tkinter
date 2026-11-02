@@ -182,5 +182,9 @@ class Buttons(ttk.Frame):
 		self.pack(expand=True, fill="both")
 
 
-if __name__ == '__main__':
+def main():
 	app = App("Calculator")
+
+
+if __name__ == '__main__':
+	main()
